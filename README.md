@@ -31,6 +31,7 @@ $ sudo sysctl -w vm.max_map_count=262144
 | Grafana       | [localhost:3000](http://localhost:3000)   |
 | Graylog       | [localhost:9000](http://localhost:9000)   |
 | Kibana        | [localhost:5601](http://localhost:5601)   |
+| Jaeger        | [localhost:16686](http://localhost:16686) |
 | Logstash      | [localhost:9600](http://localhost:9600)   |
 | MongoDB       | [localhost:27017](http://localhost:27017) |
 | Prometheus    | [localhost:9090](http://localhost:9090)   |
