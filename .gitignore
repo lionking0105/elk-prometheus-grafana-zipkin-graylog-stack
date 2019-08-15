@@ -8,6 +8,8 @@ bin/
 mongodb-data/
 grafana-storage/
 graylog-journal/
+graylog-config/
+elasticsearch-data/
 
 ### STS ###
 .apt_generated

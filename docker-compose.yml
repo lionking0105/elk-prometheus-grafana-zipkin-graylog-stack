@@ -22,8 +22,15 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.1
+    environment:
+      - discovery.type=single-node
+      - http.port=9200
+      - http.cors.enabled=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,chrome-extension://jopjeaiilkcibeohjdmejhoifenbnmlh
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
     volumes:
-      - ./elasticsearch-data:/var/lib/elasticsearch/data
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -32,33 +39,33 @@ services:
         soft: -1
         hard: -1
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:6.8.1
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:6.8.1
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - elasticsearch
 
-  logstash:
-    image: docker.elastic.co/logstash/logstash:6.8.1
-    ports:
-      - "5000:5000"
-      - "9600:9600"
-    volumes:
-      - ./logstash.conf:/etc/logstash/logstash.conf
-    command: logstash -f /etc/logstash/logstash.conf
-    depends_on:
-      - elasticsearch
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash:6.8.1
+  #   ports:
+  #     - "5000:5000"
+  #     - "9600:9600"
+  #   volumes:
+  #     - ./logstash.conf:/etc/logstash/logstash.conf
+  #   command: logstash -f /etc/logstash/logstash.conf
+  #   depends_on:
+  #     - elasticsearch
 
-  zipkin:
-    image: openzipkin/zipkin:2.15.0
-    ports:
-      - "9411:9411"
-    environment:
-      - STORAGE_TYPE=elasticsearch
-      - ES_HOSTS=elasticsearch:9200
-    depends_on:
-      - elasticsearch
+  # zipkin:
+  #   image: openzipkin/zipkin:2.15.0
+  #   ports:
+  #     - "9411:9411"
+  #   environment:
+  #     - STORAGE_TYPE=elasticsearch
+  #     - ES_HOSTS=elasticsearch:9200
+  #   depends_on:
+  #     - elasticsearch
 
   mongodb:
     image: mongo:3.6.13
@@ -91,6 +98,7 @@ services:
       - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
     volumes:
       - ./graylog-journal:/usr/share/graylog/data/journal
+      - ./graylog-config:/usr/share/graylog/data/config
     links:
       - mongodb:mongo
       - elasticsearch
@@ -114,3 +122,4 @@ volumes:
   elasticsearch-data:
   mongodb-data:
   graylog-journal:
+  graylog-config:
