@@ -1,0 +1,112 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd:
+          kompose -o openshift-grafana.yaml --provider openshift --file docker-compose.yml
+          convert -v
+        kompose.version: 1.18.0 (06a2e56)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+      name: grafana
+    spec:
+      ports:
+        - name: "3000"
+          port: 3000
+          targetPort: 3000
+      selector:
+        io.kompose.service: grafana
+      # externalIPs: ["172.47.0.10"]
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      annotations:
+        kompose.cmd:
+          kompose -o openshift-grafana.yaml --provider openshift --file docker-compose.yml
+          convert -v
+        kompose.version: 1.18.0 (06a2e56)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+      name: grafana
+    spec:
+      replicas: 1
+      selector:
+        io.kompose.service: grafana
+      strategy:
+        resources: {}
+        type: Recreate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            io.kompose.service: grafana
+        spec:
+          containers:
+            - env:
+                - name: GF_SECURITY_ADMIN_PASSWORD
+                  value: secret
+              image: " "
+              name: grafana
+              ports:
+                - containerPort: 3000
+              resources: {}
+              volumeMounts:
+                - mountPath: /var/lib/grafana
+                  name: grafana-storage
+          restartPolicy: Always
+          volumes:
+            - name: grafana-storage
+              persistentVolumeClaim:
+                claimName: grafana-storage
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - grafana
+            from:
+              kind: ImageStreamTag
+              name: grafana:latest
+          type: ImageChange
+    status: {}
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+      name: grafana
+    spec:
+      tags:
+        - annotations: null
+          from:
+            kind: DockerImage
+            name: grafana/grafana
+          generation: null
+          importPolicy: {}
+          name: latest
+    status:
+      dockerImageRepository: ""
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana-storage
+      name: grafana-storage
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+kind: List
+metadata: {}

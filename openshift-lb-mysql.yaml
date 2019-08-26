@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-egress-1
+spec:
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+  # loadBalancerIP: 172.29.0.1
+  loadBalancerIP:
+  type: LoadBalancer
+  selector:
+    name: mysql

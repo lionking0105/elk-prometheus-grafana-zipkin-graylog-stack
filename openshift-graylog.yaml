@@ -1,0 +1,135 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd:
+          kompose -o openshift-graylog.yaml --provider openshift --file docker-compose.yml
+          convert -v
+        kompose.version: 1.18.0 (06a2e56)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: graylog
+      name: graylog
+    spec:
+      ports:
+        - name: "9000"
+          port: 9000
+          targetPort: 9000
+        - name: "514"
+          port: 514
+          targetPort: 514
+        - name: 514-udp
+          port: 514
+          protocol: UDP
+          targetPort: 514
+        - name: "12201"
+          port: 12201
+          targetPort: 12201
+        - name: 12201-udp
+          port: 12201
+          protocol: UDP
+          targetPort: 12201
+        - name: "12202"
+          port: 12202
+          protocol: UDP
+          targetPort: 12202
+        - name: "12203"
+          port: 12203
+          protocol: UDP
+          targetPort: 12203
+        - name: "12204"
+          port: 12204
+          protocol: UDP
+          targetPort: 12204
+      selector:
+        io.kompose.service: graylog
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      annotations:
+        kompose.cmd:
+          kompose -o openshift-graylog.yaml --provider openshift --file docker-compose.yml
+          convert -v
+        kompose.version: 1.18.0 (06a2e56)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: graylog
+      name: graylog
+    spec:
+      replicas: 1
+      selector:
+        io.kompose.service: graylog
+      strategy:
+        resources: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            io.kompose.service: graylog
+        spec:
+          containers:
+            - env:
+                - name: GRAYLOG_ELASTICSEARCH_HOSTS
+                  value: http://elasticsearch:9200
+                - name: GRAYLOG_HTTP_EXTERNAL_URI
+                  value: http://openshift-graylog.192.168.64.3.nip.io/
+                - name: GRAYLOG_MONGODB_URI
+                  value: mongodb://mongodb:27017/graylog
+                - name: GRAYLOG_PASSWORD_SECRET
+                  value: somepasswordpepper
+                - name: GRAYLOG_ROOT_PASSWORD_SHA2
+                  value: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+              image: " "
+              name: graylog
+              ports:
+                - containerPort: 9000
+                - containerPort: 514
+                - containerPort: 514
+                  protocol: UDP
+                - containerPort: 12201
+                - containerPort: 12201
+                  protocol: UDP
+                - containerPort: 12202
+                  protocol: UDP
+                - containerPort: 12203
+                  protocol: UDP
+                - containerPort: 12204
+                  protocol: UDP
+              resources: {}
+          restartPolicy: Always
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - graylog
+            from:
+              kind: ImageStreamTag
+              name: graylog:3.0.2-2
+          type: ImageChange
+    status: {}
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: graylog
+      name: graylog
+    spec:
+      tags:
+        - annotations: null
+          from:
+            kind: DockerImage
+            name: karluqs/graylog:3.0.2-2-root
+          generation: null
+          importPolicy: {}
+          name: 3.0.2-2
+    status:
+      dockerImageRepository: ""
+kind: List
+metadata: {}

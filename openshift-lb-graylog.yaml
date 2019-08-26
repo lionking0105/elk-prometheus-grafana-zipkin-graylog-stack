@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: graylog-lb
+spec:
+  ports:
+    - name: graylog-udp-12202
+      port: 12202
+      protocol: UDP
+      targetPort: 12202
+  # loadBalancerIP: 172.29.0.1
+  loadBalancerIP:
+  type: LoadBalancer
+  selector:
+    io.kompose.service: graylog
